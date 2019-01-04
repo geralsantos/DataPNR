@@ -380,8 +380,8 @@ public function borrar_registro(){
 									$nombre = $nombrewosplit;
 								}
 								$apellido = $pasajeros["passengerData"]["travellerInformation"]["traveller"]["surname"];
-								$tipodoc = substr($num_docs[$key], 0, 2);
-								$numdoc = substr($num_docs[$key], strlen($tipodoc));
+								$tipodoc = substr($num_docs[0], 0, 2);
+								$numdoc = substr($num_docs[0], strlen($tipodoc));
 								$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
 							}
 						}
