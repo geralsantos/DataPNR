@@ -1,4 +1,4 @@
-<template id="indicador_1">
+<template id="portada-index">
     <div class="content mt-3">
         <div class="col-lg-12" v-if="mostrar">
             <div class="card">
