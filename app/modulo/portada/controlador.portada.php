@@ -87,112 +87,8 @@ class portada extends App{
         return false;
       }
 
-    }
-    public function cargar_datos_all_pantalla_principal(){
-
-      if( $_POST['tabla'] && $_POST['where'] ){
-        $modelo = new modeloPortada();
-        $_POST['where']["estado"] = ["estado",1];
-        $res = $modelo->selectRowDataAll( $_POST['tabla'], $_POST['campos'], $_POST['where'], $_POST['groupby'] );
-        if ($res) {
-          echo json_encode(array("atributos"=>$res )) ;
-        }else{
-          return false;
-        }
-      }else{
-        return false;
-      }
-    }
-    public function cargar_datos_all(){
-
-      if( $_POST['tabla'] && $_POST['where'] ){
-        $modelo = new modeloPortada();
-
-        $_POST['where']["estado"] = ["estado",1];
-        $res = $modelo->selectDataAll( $_POST['tabla'], $_POST['where'] );
-        if ($res) {
-          echo json_encode(array("atributos"=>$res )) ;
-        }else{
-          return false;
-        }
-      }else{
-        return false;
-      }
-    }
-
-    public function insertar_datos_x(){
-
-      if( $_POST['tabla'] && $_POST['campos'] ){
-
-        $modelo = new modeloPortada();
-        $res = $modelo->insertData( $_POST['tabla'], $_POST['campos'] );
-
-        if ($res) {
-          echo json_encode(array("resultado"=>true )) ;
-        }else{
-          return false;
-        }
-      }
-
-    }
-
-     public function cargar_datos_groupby(){
-
-      if( $_POST['tabla'] ){
-        $modelo = new modeloPortada();
-        $where = !isset($_POST["where"]) ? '' : $_POST["where"];
-        $_POST['where']["estado"] = 1;
-        $res = $modelo->selectRowDataAll( $_POST['tabla'], $_POST['campos'], $where, $_POST['groupby'] );
-
-        if ($res) {
-          $arr = array();
-          $personas = array();
-          foreach ($res as $key => $value) {
-            $arr[]=$value["servicios"];
-          }
-          $arr = array_count_values($arr);
-          $rr = [];
-          foreach ($arr as $key => $value) {
-            $rr[]= array("personas"=>floatval($value),"servicios"=>$key);
-          }
-          echo json_encode(array("atributos"=>$rr)) ;
-        }else{
-          return false;
-        }
-      }else{
-        return false;
-      }
-    }
-    public function cargar_datos_all_admin(){
-
-      if( $_POST['tabla'] && $_POST['where'] ){
-        $modelo = new modeloPortada();
-        $_POST['where']["estado"] = ["estado",1];
-        $res = $modelo->selectDataAll( $_POST['tabla'], $_POST['where'] );
-        if ($res) {
-          $result = [];$before_turno_1=0;$before_turno_2=0;$before_date='';$count=[];
-         //print_r(($res));die();
-          foreach ($res as $key => $value) {
-            $date = date("n",strtotime($value["fecha"]));
-            $result[$date] = array("mes"=> $date, "turno_1"=>($value["turno_1"]+$before_turno_1), "turno_2"=>($value["turno_2"]+$before_turno_2),"incidentes_resueltos"=>($value["incidentes_resueltos"]), "incidentes_identificados"=>($value["incidentes_identificados"]),"incidentes_resueltos_t2"=>($value["incidentes_resueltos_t2"]), "incidentes_identificados_t2"=>($value["incidentes_identificados_t2"]),"count"=>(!isset($count[$date])?1:($count[$date]+1)));
-            $before_turno_1=$before_date ==""? $value["turno_1"] : ($before_date == $date ? ($value["turno_1"]+$before_turno_1) : 0);
-            $before_turno_2=$before_date ==""? $value["turno_2"] : ($before_date == $date ? ($value["turno_2"]+$before_turno_2) : 0);
-            $before_date = $date;
-            $count[$date] = !isset($count[$date])?1:($count[$date]+1);
-          }
-          $arr=[];
-          foreach ($result as $key => $value) {
-            $arr[] = $value;
-          }
-          echo json_encode(array("atributos"=>$arr )) ;
-        }else{
-          return false;
-        }
-      }else{
-        return false;
-      }
-
-    }
+    } 
+     
     /*public function cargar_datos_sqlserver(){
 
         $modelo = new modeloPortada();
@@ -278,362 +174,8 @@ class portada extends App{
       }
 
     }
-    public function cargar_datos_union(){
-
-      if( $_POST['consulta'] ){
-        $modelo = new modeloPortada();
-
-
-        $query = " ". $_POST['consulta'] . " UNION ALL " . $_POST['consulta_2'];
-        $res = $modelo->executeQuery($query  );
-        if ($res) {
-          echo json_encode(array("data"=>$res)) ;
-        }else{
-          return false;
-        }
-     }
-
-    }
-    public function cargar_datos_fecha(){
-
-      if( $_POST['consulta'] ){
-        $modelo = new modeloPortada();
-
-
-        $query = " ". $_POST['consulta'] . " UNION ALL " . $_POST['consulta_2'];
-
-        $res = $modelo->executeQuery($query  );
-        if ($res) {
-          foreach ($res as $value) {
-            if ( $value["tipo"] == '1' ){
-              $val = a_romano($value["trimestre"]);
-              if( $value["trimestre"] == '1' ){
-                $data["trimestre_1"]["programados"] = floatval($value["cantidad"]);
-                 $data["trimestre_1"]["category"] = 'Trimestre ' . $val;
-                 $data["trimestre_1"]["trimestre"] = $value["trimestre"];
-
-               }
-              if( $value["trimestre"] == '2' ){
-                $data["trimestre_2"]["programados"] = floatval($value["cantidad"]);
-                 $data["trimestre_2"]["category"] = 'Trimestre ' . $val;
-                 $data["trimestre_2"]["trimestre"] = $value["trimestre"];
-              }
-              if( $value["trimestre"] == '3' ){
-                $data["trimestre_3"]["programados"] = floatval($value["cantidad"]);
-                $data["trimestre_3"]["category"] = 'Trimestre ' . $val;
-                $data["trimestre_3"]["trimestre"] = $value["trimestre"];
-              }
-              if( $value["trimestre"] == '4' ){
-                $data["trimestre_4"]["programados"] = floatval($value["cantidad"]);
-                $data["trimestre_4"]["category"] = 'Trimestre ' . $val;
-                $data["trimestre_4"]["trimestre"] = $value["trimestre"];
-              }
-
-
-            }
-            if ( $value["tipo"] == '2' ){
-              if( $value["trimestre"] == '1' ){
-                $data["trimestre_1"]["ejecutados"] = floatval($value["cantidad"]);
-              }
-              if( $value["trimestre"] == '2' ){
-                $data["trimestre_2"]["ejecutados"] = floatval($value["cantidad"]);
-              }
-              if( $value["trimestre"] == '3' ){
-                $data["trimestre_3"]["ejecutados"] = floatval($value["cantidad"]);
-              }
-              if( $value["trimestre"] == '4' ){
-                $data["trimestre_4"]["ejecutados"] = floatval($value["cantidad"]);
-              }
-
-            }
-
-          }
-
-          echo json_encode(array("data"=>$data)) ;
-        }else{
-          return false;
-        }
-     }
-
-    }
-
-
-public function insertar_datos(){
-
-  //tinee que ser nivel 2 para insertar o editar
-  if ($_SESSION["usuario"][0]["kpi_roles_id"] == '2') {
-
-    if( $_POST['tabla'] && $_POST['insert'] && $_POST['update'] && $_POST['where'] ){
-
-      $modelo = new modeloPortada();
-      $res = $modelo->selectRowData($_POST['tabla'],'*', $_POST['where']);
-
-      if($res){
-
-        //ya existe, se actualiza
-
-        if(date("Y-m-d", strtotime($res["fecha_creacion"])) == date("Y-m-d") ){
-
-          //está dentro del mismo día el registro se puede editar
-
-          $_POST['update']['kpi_usuario_modificacion'] = $_SESSION["usuario"][0]["id"];
-          $_POST['update']['fecha_modificacion'] = date("Y-m-d H:i:s");
-          $_POST['update']['estado'] = 1;
-          $id_registro = $res["id"];
-          $res = $modelo->updateData( $_POST['tabla'], $_POST['update'], array("id"=>$res["id"]));
-
-          if ($res) {
-
-            echo json_encode(array("resultado"=>true, "mensaje"=>"Registro actualizado", "editado"=>"0" ));
-          }else{
-            return false;
-          }
-
-        }else{
-
-          //está fuera del rango de fechas.su registro va a lista de espera
-          $_POST['temporal']['kpi_usuario_modificacion'] = $_SESSION["usuario"][0]["id"];
-          $id_registro = $res["id"];
-          $_POST['temporal']['fecha_modificacion'] = date("Y-m-d H:i:s");
-          $_POST['temporal']['estado'] = 1;
-
-          $res = $modelo->updateData( $_POST['tabla'], $_POST['temporal'], array("id"=>$res["id"]));
-
-          if ($res) {
-              $res = $modelo->selectRowData('kpi_lista_cambios','*', array( "nombre_tabla"=>$_POST['tabla'],
-                                        "id_registro"=>$id_registro, "estado"=>1));
-
-              if($res){
-                //existe no hace nada porque ya está regsitrado
-                $valores = array("usuario_nombre"=> $_SESSION["usuario"][0]["nombre"] .' '. $_SESSION["usuario"][0]["apellido"],
-                "kpi_usuario_modificacion" => $_SESSION["usuario"][0]["id"], "fecha_modificacion" => date("Y-m-d H:i:s"), "estado"=> 1);
-                  $res = $modelo->updateData( 'kpi_lista_cambios', $valores, array( "nombre_tabla"=>$_POST['tabla'], "id_registro"=>$id_registro));
-
-                  if($res){
-                    echo json_encode(array("resultado"=>true, "mensaje"=>"Campo editado. Los cambios se visualizarán luego de ser aprobados", "editado"=>"1" ));
-                  }else{
-                    echo json_encode(array("resultado"=>false, "mensaje"=>"Ha ocurrido un error" ));
-                  }
-
-
-              }else{
-                //registra
-                $valores = array("nombre_tabla"=>$_POST['tabla'],
-                      "id_registro"=> $id_registro,
-                      "usuario_nombre"=> $_SESSION["usuario"][0]["nombre"] .' '. $_SESSION["usuario"][0]["apellido"],
-                      "kpi_usuario_modificacion" => $_SESSION["usuario"][0]["id"],
-                      "kpi_usuario_registro" => $_SESSION["usuario"][0]["id"],
-                      "fecha_creacion"=>date("Y-m-d H:i:s"));
-                      $resultado = $modelo->insertData( 'kpi_lista_cambios', $valores );
-                      if ($resultado) {
-                        echo json_encode(array("resultado"=>true, "mensaje"=>"Campo editado. Los cambios se visualizarán luego de ser aprobados", "editado"=>"1" ));
-                      }else{
-                        echo json_encode(array("resultado"=>false, "mensaje"=>"Ha ocurrido un error" ));
-                    }
-              }
-            }else{
-              return false;
-            }
-        }
-
-
-      }else{
-        //registra
-
-          $_POST['insert']['kpi_usuario_modificacion'] = $_SESSION["usuario"][0]["id"];
-          $_POST['insert']['kpi_usuario_registro'] = $_SESSION["usuario"][0]["id"];
-          $_POST['insert']['fecha_creacion'] = date("Y-m-d H:i:s");
-
-          $res = $modelo->insertData( $_POST['tabla'], $_POST['insert'] );
-          if ($res) {
-            echo json_encode(array("resultado"=>true, "mensaje"=>"Campo registrado", "editado"=>"0" ));
-          }else{
-            return false;
-          }
-      }
-
-    }else{
-      return false;
-    }
-
-  }else{
-    echo json_encode(array("resultado"=>false, "mensaje"=>"No posee permisos para insertar este registro" ));
-  }
-
-
-}
-public function insertar_datos_only(){
-
-  if( $_POST['tabla'] && $_POST['insert']  && $_POST['where'] ){
-
-    $modelo = new modeloPortada();
-    $res = $modelo->selectRowData($_POST['tabla'],'*', $_POST['where']);
-    if($res){
-
-
-        return false;
-
-    }else{
-      //registra
-
-      $_POST['insert']['kpi_usuario_modificacion'] = $_SESSION["usuario"][0]["id"];
-      $_POST['insert']['kpi_usuario_registro'] = $_SESSION["usuario"][0]["id"];
-      $_POST['insert']['fecha_creacion'] = date("Y-m-d H:i:s");
-
-
-    $res = $modelo->insertData( $_POST['tabla'], $_POST['insert'] );
-
-    if ($res) {
-      echo json_encode(array("resultado"=>true )) ;
-    }else{
-      return false;
-    }
-    }
-
-  }else{
-    return false;
-  }
-}
-
-public function update_data(){
-
-  if( $_POST['tabla'] && $_POST['where'] && $_POST['update']){
-    $_POST['update']['fecha_modificacion'] = date("Y-m-d H:i:s");
-    $modelo = new modeloPortada();
-    $res = $modelo->updateData( $_POST['tabla'], $_POST['update'], $_POST['where']);
-       if ($res) {
-        echo json_encode(array("resultado"=>true )) ;
-      }else{
-        return false;
-      }
-  }
- }
-
- public function update_data_lista_cambios(){
-
-  if( $_POST['tabla'] && $_POST['where']){
-
-    $modelo = new modeloPortada();
-
-    $res = $modelo->selectRowData($_POST['tabla'],'*', $_POST['where']);
-    if($res){
-      $valores = [];
-
-      foreach($res as $item => $value ){
-
-        if(substr($item, 0, 4) == "tmp_"){
-          $nuevo_item=substr($item, 4);
-          $valores[$nuevo_item] = $value;
-          $valores[$item] = 0;
-        }
-
-      }
-      $valores["fecha_modificacion"]=date("Y-m-d H:i:s");
-
-      $res = $modelo->updateData( $_POST['tabla'], $valores, $_POST['where']);
-
-      if ($res) {
-        echo json_encode(array("resultado"=>true, "mensaje"=>"Resistro aprobado exitosamente" ));
-      }else{
-        return false;
-      }
-    }
-
-  }
- }
- public function descartar_data_lista_cambios(){
-
-  if( $_POST['tabla'] && $_POST['where']){
-
-    $modelo = new modeloPortada();
-
-    $res = $modelo->selectRowData($_POST['tabla'],'*', $_POST['where']);
-    if($res){
-      $valores = [];
-
-      foreach($res as $item => $value ){
-
-        if(substr($item, 0, 4) == "tmp_"){
-
-          $valores[$item] = 0;
-        }
-
-      }
-      $valores["fecha_modificacion"]=date("Y-m-d H:i:s");
-      $res = $modelo->updateData( $_POST['tabla'], $valores, $_POST['where']);
-
-      if ($res) {
-        echo json_encode(array("resultado"=>true, "mensaje"=>"Resistro descartado exitosamente" ));
-      }else{
-        return false;
-      }
-    }
-
-  }
- }
-
- public function cargar_datos_sin_editado(){
-
-  if( $_POST['tabla'] && $_POST['where'] ){
-
-    $modelo = new modeloPortada();
-    $res = $modelo->selectData( $_POST['tabla'], $_POST['where'] );
-    if ($res) {
-      echo json_encode(array( "atributos"=>$res )) ;
-    }else{
-      return false;
-    }
-  }else{
-    return false;
-  }
-
-}
-
-public function ejecutar_consulta(){
-  if( $_POST['tabla'] && $_POST['campo'] &&  $_POST['like']){
-    $modelo = new modeloPortada();
-    $sql = "SELECT * FROM " . $_POST['tabla'] . " WHERE ". $_POST['campo'] . " LIKE '%".$_POST['like']."%' AND estado=1";
-    $res = $modelo->executeQuery( $sql );
-    if ($res) {
-      echo json_encode(array( "data"=>$res )) ;
-    }else{
-      return false;
-    }
-
-   }
-}
-
-public function verificar_nivel_usuario(){
-  $id = $_SESSION["usuario"][0]["id"];
-  $modelo = new modeloPortada();
-  $query = "SELECT * FROM kpi_usuarios WHERE id=".$id;
-  $res = $modelo->executeQuery( $query );
-  $nivel = $res[0]["kpi_roles_id"];
-  echo json_encode(array( "nivel"=>$nivel )) ;
-}
-
-public function cargar_datos_rubro_grupo(){
-  $modelo = new modeloPortada();
-  $query = "SELECT a.*, b.nombre_grupo as nombre_grupo FROM kpi_rubro as a LEFT JOIN kpi_grupo as b ON a.id_grupo = b.id ORDER BY b.id";
-  $res = $modelo->executeQuery( $query );
-  if ($res) {
-    echo json_encode(array( "data"=>$res )) ;
-  }else{
-    return false;
-  }
-
-}
-public function cargar_lista_cambios(){
-  $modelo = new modeloPortada();
-  $query = "SELECT a.*, b.nombre as nombre_indicador FROM kpi_lista_cambios as a LEFT JOIN kpi_modulos as b ON a.nombre_tabla  = b.codigo WHERE a.estado =1";
-  $res = $modelo->executeQuery( $query );
-  if ($res) {
-    echo json_encode(array( "data"=>$res )) ;
-  }else{
-    return false;
-  }
-
-}
+     
+    
 public function borrar_registro(){
   $modelo = new modeloPortada();
   if( $_POST['tabla'] && $_POST['where'] ){
@@ -647,6 +189,209 @@ public function borrar_registro(){
       }
   }
  }
+ public function is_array_($array){
+	try {
+		foreach (array_keys($array) as $value) {
+			if (!is_numeric($value)) {
+				return false;
+			}
+		}
+		return true;
+	} catch (\Throwable $th) {
+		return false;
+	}
+ }
+ 	public function cargar_archivo(){
+		$upload_folder  = APP."/cargas/";
 
+		$nombre_archivo = $_FILES['archivo']['name'];
+		$tipo_archivo   = $_FILES['archivo']['type'];
+		$tamano_archivo = $_FILES['archivo']['size'];
+		$tmp_archivo    = $_FILES['archivo']['tmp_name'];
+		$extension		= pathinfo($nombre_archivo, PATHINFO_EXTENSION);
+		$result=[];
+	  	$fichero_subido = $upload_folder . basename($nombre_archivo);
+	
+        if (move_uploaded_file($tmp_archivo, $fichero_subido)) {
+            echo "subido";
+            $modelo = new modeloPortada();
+			$ForPnrHandling = json_decode(json_encode(simplexml_load_file($fichero_subido)), true)["ForPnrHandling"];
+            foreach ($ForPnrHandling as $key => $pnrs) {
+				print_r($pnrs);
+				$pnrs = $pnrs["activePNRimage"];
+				$data_pnr = $pnrs["pnrHeader"];
+				$dataElementsIndiv = $pnrs["dataElementsMaster"]["dataElementsIndiv"];
+
+				$itinerary = $pnrs["originDestinationDetails"]["itineraryInfo"];
+				$ruta_ida = $this->is_array_($itinerary) ? ($itinerary[0]["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary[0]["travelProduct"]["boardpointDetail"]["cityCode"]) : $itinerary["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary["travelProduct"]["boardpointDetail"]["cityCode"] ;
+
+				$ruta_vuelta = $this->is_array_($itinerary) ? ( $itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["offpointDetail"]["cityCode"]." - ".$itinerary[1]["travelProduct"]["boardpointDetail"]["cityCode"]):"") : $itinerary["travelProduct"]["offpointDetail"]["cityCode"]." - ".$itinerary["travelProduct"]["boardpointDetail"]["cityCode"];
+				
+				$trama = $ruta_ida . " - " . $ruta_vuelta;
+				
+				$vuelo_ida = $this->is_array_($itinerary) ? ($itinerary[0]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[0]["travelProduct"]["productDetails"]["identification"]) : "") : ($itinerary["travelProduct"]["productDetails"]["identification"]);
+				
+				$vuelo_retorno = $this->is_array_($itinerary) ? ($itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["productDetails"]["identification"]) : "") : "";
+
+				$vuelo = empty($vuelo_retorno) ? $vuelo_ida : ($vuelo_ida." - ".$vuelo_retorno);
+
+				$oficina =
+				/*pnr_head table inicio*/
+				$pnr_cod = $data_pnr["reservationInfo"]["reservation"]["controlNumber"];
+				$nombre_archivo = $nombre_archivo;
+				/*pnr_head table end*/
+				$numbers_ref = [];
+				$num_docs = [];
+				foreach ($dataElementsIndiv	 as $key => $dataElement) {
+					if (!empty($dataElement["serviceRequest"])) {
+						if ($dataElement["serviceRequest"]["ssr"]["type"] == "FOID") {
+							$num_docs[] = $dataElement["serviceRequest"]["ssr"]["freeText"];
+							$numbers_ref[] = $dataElement["referenceForDataElement"]["reference"]["number"];
+						}
+					}
+				}
+				/*pnr_pax table inicio*/
+				$pasajeros = $pnrs["travellerInfo"];
+				$pasajeros_reserva = [];
+				$infs=0;
+				$adts=0;
+				$chds=0;
+				if ($this->is_array_($pasajeros)) {
+					foreach ($pasajeros as $key => $pas) {
+						$reference = $pas["elementManagementPassenger"]["elementReference"]["number"];
+						foreach ($numbers_ref as $key => $numref) {
+							if ($numref == $reference) {
+								$passengerData = $pas["passengerData"];
+								if ($this->is_array_($passengerData)) {
+									foreach ($passengerData as $value) {
+										$pax = $value["travellerInformation"]["passenger"]["type"];
+										$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+										$adts = ($pax == "INF" ? $adts : ($adts + 1));//cuenta los adultos
+										
+										$nombrewosplit = $pas["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
+										//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+										if (strpos($nombrewosplit, (" ".$pax))===true) {
+											$nombre = explode((" ".$pax), $nombrewosplit)[0];
+										} else {
+											$nombre = $nombrewosplit;
+										}
+										$apellido = $pas["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
+										$tipodoc = substr($num_docs[$key], 0, 2);
+										$numdoc = substr($num_docs[$key], strlen($tipodoc));
+										$tipopax = $value["travellerInformation"]["passenger"]["type"];
+										$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+									}
+								} else {
+									$passenger = $passengerData["travellerInformation"]["passenger"];
+									if ($this->is_array_($passenger)) {//con infantes
+										$adulto_con_infante = $pas["enhancedPassengerData"];
+										foreach ($adulto_con_infante as $pasajero) {
+											$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
+											$pax = $pax == null ? "ADT" : $pax;
+
+											$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+											$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+											$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
+											//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
+											if (strpos($nombrewosplit, (" ".$pax))===true) {
+												$nombre = explode((" ".$pax), $nombrewosplit)[0];
+											} else {
+												$nombre = $nombrewosplit;
+											}
+											$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
+											$tipodoc = substr($num_docs[$key], 0, 2);
+											$numdoc = substr($num_docs[$key], strlen($tipodoc));
+											$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+										}
+									} else {
+										$pax = $passengerData["travellerInformation"]["passenger"]["type"];
+										$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+										$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
+
+										$nombrewosplit = $pas["passengerData"]["travellerInformation"]["passenger"]["firstName"];
+										//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+										if (strpos($nombrewosplit, (" ".$pax))===true) {
+											$nombre = explode((" ".$pax), $nombrewosplit)[0];
+										} else {
+											$nombre = $nombrewosplit;
+										}
+										$apellido = $pas["passengerData"]["travellerInformation"]["traveller"]["surname"];
+										$tipodoc = substr($num_docs[$key], 0, 2);
+										$numdoc = substr($num_docs[$key], strlen($tipodoc));
+										$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+									}
+								}
+							}
+						}
+					}
+				} else {
+					$nombrewosplit = "";
+					//$reference = $pasajeros["elementManagementPassenger"]["reference"]["number"];
+					//if ($numbers_ref[0] == $reference) {
+						$pass = $pasajeros["passengerData"];//con infante
+						if ($this->is_array_($pass)) {
+							foreach ($pass as $key => $value) {
+								$pax = $value["travellerInformation"]["passenger"]["type"];
+								$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+								$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los infantes
+								$nombrewosplit = $pasajeros["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
+								//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+								if (strpos($nombrewosplit, (" ".$pax))===true) {
+									$nombre = explode((" ".$pax), $nombrewosplit)[0];
+								} else {
+									$nombre = $nombrewosplit;
+								}
+								$apellido = $pasajeros["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
+								$tipodoc = substr($num_docs[$key], 0, 2);
+								$numdoc = substr($num_docs[$key], strlen($tipodoc));
+								$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+							}
+						} else { //sin infante
+							$passenger = $pass["travellerInformation"]["passenger"];
+							if ($this->is_array_($passenger)) {//con infantes
+								$adulto_con_infante = $pasajeros["enhancedPassengerData"];
+								foreach ($adulto_con_infante as $pasajero) {
+									$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
+									$pax = empty($pax) ? "ADT" : $pax;
+
+									$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+									$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+									$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
+									//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
+									if (strpos($nombrewosplit, (" ".$pax))===true) {
+										$nombre = explode((" ".$pax), $nombrewosplit)[0];
+									} else {
+										$nombre = $nombrewosplit;
+									}
+									$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
+									$tipodoc = substr($num_docs[$key], 0, 2);
+									$numdoc = substr($num_docs[$key], strlen($tipodoc));
+									$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+								}
+							} else {
+								$pax = $pass["travellerInformation"]["passenger"]["type"];
+								$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+								$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
+								$nombrewosplit = $pasajeros["passengerData"]["travellerInformation"]["passenger"]["firstName"];
+								//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+								if (strpos($nombrewosplit, (" ".$pax))===true) {
+									$nombre = explode((" ".$pax), $nombrewosplit)[0];
+								} else {
+									$nombre = $nombrewosplit;
+								}
+								$apellido = $pasajeros["passengerData"]["travellerInformation"]["traveller"]["surname"];
+								$tipodoc = substr($num_docs[$key], 0, 2);
+								$numdoc = substr($num_docs[$key], strlen($tipodoc));
+								$pasajeros_reserva[] = array("numdoc"=>$numdoc,"apellido"=>$apellido,"nombre"=>$nombre,"pax"=>$pax,"tipodoc"=>$tipodoc);
+							}
+						}
+					//}
+				}
+				/*pnr_pax table end*/
+				print_r($pasajeros_reserva);
+				echo "corte pnr";
+        	}
+		}
+	 } 
 
 }
