@@ -17,7 +17,7 @@ define( "PUBLICO", ROOT );
 
 //UBICACIONES PUBLICAS
 //define( "BASE", "/deincon/portal/" );
-define( "BASE", "/portal-kpi/" );
+define( "BASE", "/DataPNR/" );
 
 define( "IMG", BASE . 'img' );
 define( "JS", BASE . 'js' );
@@ -32,10 +32,10 @@ define( "RUTA_LOGO", 'https://payload220.cargocollective.com/1/2/87981/6711909/l
 define( "RUTA_IMPRESION", SITE_URL_DIR ."portal/index?id_empresa=2&serie_cor=F001-1&monto=5.00&fecha_emision=2018-08-23" );
 
 //ACCESO A BASE DE DATOS
-define('HOST_BASE_DATOS', '142.93.52.143');
-define('NOMBRE_BASE_DATOS', 'admin_default_test');
-define('USUARIO_BASE_DATOS', 'geral');
-define('CLAVE_BASE_DATOS', 'Almavion-123');
+define('HOST_BASE_DATOS', 'localhost');
+define('NOMBRE_BASE_DATOS', 'DataPNR');
+define('USUARIO_BASE_DATOS', 'root');
+define('CLAVE_BASE_DATOS', '');
 define ('NUM_PERPAGE',10);
 
 //RUTA POR DEFECTO
@@ -49,7 +49,7 @@ define ('DESARROLLO',TRUE);
 define ('REQUIERE_ACCESO',TRUE);
 define ('URL_AMIGABLE',TRUE);
 define ('HTML',TRUE);
-define ('TITULO_DEFAULT','PORTAL DE CONSULTA');
+define ('TITULO_DEFAULT','DataPNR');
 
 
 //RECURSOS GENERALES
