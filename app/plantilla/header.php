@@ -46,10 +46,10 @@
                 <li class="active">
                     <a href="#portada-index" @click="changeview('portada-index')"> <i class="menu-icon fa fa-dashboard"></i>Pantalla Principal </a>
                 </li>
-                <h3 class="menu-title">Indicadores</h3><!-- /.menu-title -->
-                <modulos :changeviewevent="changeview">
+                <h3 class="menu-title">Modulos</h3><!-- /.menu-title -->
+                <!--<modulos :changeviewevent="changeview">
 
-                </modulos>
+                </modulos> -->
 
             </ul>
         </div><!-- /.navbar-collapse -->
@@ -77,7 +77,7 @@
             <div class="col-sm-5">
                 <div class="user-area dropdown float-right">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <img class="user-avatar rounded-circle" src="<?php echo IMAGES ?>/admin.png" alt="User Avatar">
+                        <img class="user-avatar rounded-circle" src="<?php echo IMAGES ?>/admin.jpg" alt="User Avatar">
                     </a>
 
                     <div class="user-menu dropdown-menu">
@@ -89,7 +89,7 @@
 
                 <div class="language-select dropdown" id="language-select">
                     <a class="dropdown-toggle" href="#" data-toggle="dropdown"  id="language" aria-haspopup="true" aria-expanded="true">
-                        <i class="fa-fa-user-circle"><?php echo $_SESSION["usuario"][0]["apellido"]." ".$_SESSION["usuario"][0]["nombre"]." (".$_SESSION["usuario"][0]["nombre_nivel"].")"; ?> </i>
+                        <i class="fa-fa-user-circle"><?php echo $_SESSION["usuario"][0]["apellido"]." ".$_SESSION["usuario"][0]["nombre"].""; ?> </i>
                     </a>
 
                 </div>
@@ -104,8 +104,8 @@
         <div class="col-sm-8">
             <div class="page-header float-left">
                 <div class="page-title">
-                    <h1>TABLERO INDICADORES MAC - Reporte Consolidado</h1>
-                    <p><?php echo $_SESSION["usuario"][0]["nombre_sede"] ?></p>
+                    <h1>Subir XML - Amadeus</h1>
+                    <p><?php //echo $_SESSION["usuario"][0]["nombre_sede"] ?></p>
 
                 </div>
             </div>
