@@ -14,15 +14,17 @@ Vue.component('portada-index', {
 
     methods:{
         guardar(){
-            var formData = new FormData(document.getElementById("formuploadajax"))
-            formData.append("archivo",document.getElementById('archivo'));
-            this.$http.post('cargar_archivo?view',formData,{headers: {'Content-Type': 'multipart/form-data'}}).then(function(response){
+           /* var formData = new FormData(document.getElementById("formuploadajax"))
+            formData.append("archivo",document.getElementById('archivo'));*/
+            this.$http.post('cargar_archivo?view').then(function(response){
+                swal("Subida", "El archivo ha sido subido.", "success");
+/*
                 let data = response.body.resultado;
                 if (data) {
                     swal("Subida", "El archivo ha sido subido.", "success");
                 }else{
                     swal("Error", "Un error ha ocurrido", "error");
-                }
+                }*/
             });
         }
     }
