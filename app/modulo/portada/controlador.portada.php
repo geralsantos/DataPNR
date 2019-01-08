@@ -531,7 +531,7 @@ public function borrar_registro(){
 			}
 			$modelo->insertDataMasivo("pnr_head",array("pnr_cod","nombre_archivo"), $arr_pnr_head);
 			$modelo->insertDataMasivo("pnr_pax",array("pnr_cod","numdoc","apellido","nombre","pax","tipodoc","boleto"), $pasajeros_reserva);
-			$modelo->insertDataMasivo("pnr_vuelo",array("pnr_cod","trama_ida","vuelo"), $arr_pnr_vuelo);
+			$modelo->insertDataMasivo("pnr_vuelo",array("pnr_cod","trama","vuelo"), $arr_pnr_vuelo);
 			fclose($handle);
 		}
 	}
