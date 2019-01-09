@@ -17,6 +17,7 @@ Vue.component('portada-index', {
            /* var formData = new FormData(document.getElementById("formuploadajax"))
             formData.append("archivo",document.getElementById('archivo'));*/
             this.$http.post('cargar_archivo?view').then(function(response){
+              //  console.log(response);
                 swal("Subida", "El archivo ha sido subido.", "success");
 /*
                 let data = response.body.resultado;

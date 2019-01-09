@@ -212,6 +212,7 @@ public function borrar_registro(){
  	public function cargar_archivo(){
 		
 		$upload_folder  = APP."/cargas/";
+		$destino_folder  = APP."/cargasleidos/";
 		/*$handle = fopen($upload_folder, "r");
 		$contents = fread($handle, filesize($upload_folder));*/
 
@@ -221,318 +222,324 @@ public function borrar_registro(){
 			if (!is_dir($archivo))//verificamos si es o no un directorio
 			{
 				
-				echo $nombre_archivo = basename($archivo);
+				$nombre_archivo = basename($archivo);
 				//$tipo_archivo   = $_FILES['archivo']['type'];
 				//$tamano_archivo = $_FILES['archivo']['size'];
 				//$tmp_archivo    = $_FILES['archivo']['tmp_name'];
 				//$extension		= pathinfo($nombre_archivo, PATHINFO_EXTENSION);
 				//echo "[".$archivo . "]<br />"; //de ser un directorio lo envolvemos entre corchetes
-				break;
-			}
-		}
-		/*$handle = fopen("/home/rasmus/file.gif", "wb");
-		$handle = fopen("http://www.example.com/", "r");
-		$handle = fopen("ftp://user:password@example.com/somefile.txt", "w");*/
-		/*$nombre_archivo = $_FILES['archivo']['name'];
-		$tipo_archivo   = $_FILES['archivo']['type'];
-		$tamano_archivo = $_FILES['archivo']['size'];
-		$tmp_archivo    = $_FILES['archivo']['tmp_name'];
-		$extension		= pathinfo($nombre_archivo, PATHINFO_EXTENSION);*/
-		$result=[];
-	  	//$fichero_subido = $upload_folder . basename($nombre_archivo);
-		
-		//if (move_uploaded_file($tmp_archivo, $fichero_subido)) 
-		if ($handle = fopen(($upload_folder.$archivo), "r")) 
-		{
-			echo "subido";
-			//$contents = fread($handle, filesize($upload_folder.$archivo));
-			//print_r($contents);
-			$modelo = new modeloPortada();
-			while (($line = fgets($handle)) !== false) {
-				if (strpos($line, ("xml version"))===false && strpos($line, ("BatchFeed"))===false) 
+			
+				/*$handle = fopen("/home/rasmus/file.gif", "wb");
+				$handle = fopen("http://www.example.com/", "r");
+				$handle = fopen("ftp://user:password@example.com/somefile.txt", "w");*/
+				/*$nombre_archivo = $_FILES['archivo']['name'];
+				$tipo_archivo   = $_FILES['archivo']['type'];
+				$tamano_archivo = $_FILES['archivo']['size'];
+				$tmp_archivo    = $_FILES['archivo']['tmp_name'];
+				$extension		= pathinfo($nombre_archivo, PATHINFO_EXTENSION);*/
+				$result=[];
+					//$fichero_subido = $upload_folder . basename($nombre_archivo);
+				
+				//if (move_uploaded_file($tmp_archivo, $fichero_subido)) 
+				if ($handle = fopen(($upload_folder.$archivo), "r")) 
 				{
-					$ForPnrHandling = json_decode(json_encode(simplexml_load_string($line)), 1);
-					//foreach ($ForPnrHandling as $key => $pnrs) 
-					//{
-						//print_r($pnrs);
-						$pnrs = $ForPnrHandling["activePNRimage"];
-						$data_pnr = $pnrs["pnrHeader"];
-						$dataElementsIndiv = $pnrs["dataElementsMaster"]["dataElementsIndiv"];
-						$dataElementsStruct = $pnrs["dataElementsMaster"]["dataElementsStruct"];
-						
-						$itinerary = $pnrs["originDestinationDetails"]["itineraryInfo"];
-						$ruta_ida = $this->is_array_($itinerary) ? ($itinerary[0]["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary[0]["travelProduct"]["offpointDetail"]["cityCode"]) : ($itinerary["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary["travelProduct"]["offpointDetail"]["cityCode"]) ;
+					//echo "subido";
 
-						$ruta_vuelta = $this->is_array_($itinerary) ? ( $itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["boardpointDetail"]["cityCode"]." - ".$itinerary[1]["travelProduct"]["offpointDetail"]["cityCode"]):"") : $itinerary["travelProduct"]["boardpointDetail"]["cityCode"]." - ".$itinerary["travelProduct"]["offpointDetail"]["cityCode"];
-						
-						$trama_ida = $ruta_ida;
-						$trama_vuelta = $ruta_vuelta;
-					
-						
-						$vuelo_ida = $this->is_array_($itinerary) ? ($itinerary[0]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[0]["travelProduct"]["productDetails"]["identification"]) : "") : ($itinerary["travelProduct"]["productDetails"]["identification"]);
-						
-						$vuelo_retorno = $this->is_array_($itinerary) ? ($itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["productDetails"]["identification"]) : "") : "";
-
-						//$vuelo = empty($vuelo_retorno) ? $vuelo_ida : ($vuelo_ida." - ".$vuelo_retorno);
-						
-					//	$oficina =
-						$pnr_cod = "";
-						/*pnr_head table inicio*/
-						if ($this->is_array_($data_pnr["reservationInfo"]) ) 
+					//$contents = fread($handle, filesize($upload_folder.$archivo));
+					//print_r($contents);
+					$modelo = new modeloPortada();
+					while (($line = fgets($handle)) !== false) {
+						if (strpos($line, ("xml version"))===false && strpos($line, ("BatchFeed"))===false) 
 						{
-							foreach ($data_pnr["reservationInfo"] as $key => $value) {
-								if(isset($value["reservation"]["date"]) && isset($value["reservation"]["time"]) )
-								{
-									if($value["reservation"]["companyId"]=="1A") 
-									{
-										$pnr_cod = $value["reservation"]["controlNumber"];
-									}
-								}
-							}
-						}else {
-							$pnr_cod = $data_pnr["reservationInfo"]["reservation"]["controlNumber"];
-						}
-						$arr_pnr_vuelo[] = "('".$pnr_cod."','".$trama_ida."','".$vuelo_ida."')";
-						$arr_pnr_vuelo[] = "('".$pnr_cod."','".$trama_vuelta."','".$vuelo_retorno."')";
-						$nombre_archivo = $nombre_archivo;
-						/*pnr_head table end*/
-						$numbers_ref = [];
-						$num_docs = [];
-						if (!empty($pnr_cod)) {
+							$ForPnrHandling = json_decode(json_encode(simplexml_load_string($line)), 1);
+							//foreach ($ForPnrHandling as $key => $pnrs) 
+							//{
+								
+
+								$pnrs = $ForPnrHandling["activePNRimage"];
+								$data_pnr = $pnrs["pnrHeader"];
+								$dataElementsIndiv = $pnrs["dataElementsMaster"]["dataElementsIndiv"];
+								$dataElementsStruct = $pnrs["dataElementsMaster"]["dataElementsStruct"];
+								
+								$itinerary = $pnrs["originDestinationDetails"]["itineraryInfo"];
+								$ruta_ida = $this->is_array_($itinerary) ? ($itinerary[0]["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary[0]["travelProduct"]["offpointDetail"]["cityCode"]) : ($itinerary["travelProduct"]["boardpointDetail"]["cityCode"] ." - ". $itinerary["travelProduct"]["offpointDetail"]["cityCode"]) ;
+
+								$ruta_vuelta = $this->is_array_($itinerary) ? ( $itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["boardpointDetail"]["cityCode"]." - ".$itinerary[1]["travelProduct"]["offpointDetail"]["cityCode"]):"") : $itinerary["travelProduct"]["boardpointDetail"]["cityCode"]." - ".$itinerary["travelProduct"]["offpointDetail"]["cityCode"];
+								
+								$trama_ida = $ruta_ida;
+								$trama_vuelta = $ruta_vuelta;
 							
-							try {
-								foreach ($dataElementsIndiv	 as $key => $dataElement) {
-									if (!empty($dataElement["serviceRequest"])) {
-										if ($dataElement["serviceRequest"]["ssr"]["type"] == "FOID") {
-											$num_docs[] = $dataElement["serviceRequest"]["ssr"]["freeText"];
-											$numbers_ref[] = $dataElement["referenceForDataElement"]["reference"]["number"];
+								
+								$vuelo_ida = $this->is_array_($itinerary) ? ($itinerary[0]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[0]["travelProduct"]["productDetails"]["identification"]) : "") : ($itinerary["travelProduct"]["productDetails"]["identification"]);
+								
+								$vuelo_retorno = $this->is_array_($itinerary) ? ($itinerary[1]["elementManagementItinerary"]["segmentName"]=="AIR" ? ($itinerary[1]["travelProduct"]["productDetails"]["identification"]) : "") : "";
+
+								//$vuelo = empty($vuelo_retorno) ? $vuelo_ida : ($vuelo_ida." - ".$vuelo_retorno);
+								
+							//	$oficina =
+								$pnr_cod = "";
+								/*pnr_head table inicio*/
+								if ($this->is_array_($data_pnr["reservationInfo"]) ) 
+								{
+									foreach ($data_pnr["reservationInfo"] as $key => $value) {
+										if(isset($value["reservation"]["date"]) && isset($value["reservation"]["time"]) )
+										{
+											if($value["reservation"]["companyId"]=="1A") 
+											{
+												$pnr_cod = $value["reservation"]["controlNumber"];
+											}
 										}
 									}
+								}else {
+									$pnr_cod = $data_pnr["reservationInfo"]["reservation"]["controlNumber"];
 								}
-								/*pnr_pax table inicio*/
-								$pasajeros = $pnrs["travellerInfo"];
-								//$arr_pnr_head = [];
-								//$arr_pnr_vuelo = [];
-								//$pasajeros_reserva = [];
-								$infs=0;
-								$adts=0;
-								$chds=0;
-								$boleto = "";
-								
-								if ($this->is_array_($pasajeros)) {
-									foreach ($pasajeros as $key => $pas) {
-										$reference = $pas["elementManagementPassenger"]["elementReference"]["number"];
-										foreach ($numbers_ref as $key => $numref) {
-											if ($numref == $reference) {
-												//buscar boleto
-												foreach ($dataElementsStruct as $key => $ElementsStruct) {
-													if (isset($ElementsStruct["ticketDocumentData"])) {
-														if (isset($ElementsStruct["referenceForStructDataElement"])) {
-															$references = $ElementsStruct["referenceForStructDataElement"]["reference"];
-															if ($this->is_array_($references)) {
-																foreach ($references as $key => $referenceStruct) {
-																	if ($numref==$referenceStruct["number"] && $referenceStruct["qualifier"] == "PT") {
-																		$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
-																		$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
-																		$boleto = $otherCompany.$tktNumber;
+								$arr_pnr_vuelo[] = "('".$pnr_cod."','".$trama_ida."','".$vuelo_ida."')";
+								$arr_pnr_vuelo[] = "('".$pnr_cod."','".$trama_vuelta."','".$vuelo_retorno."')";
+								$nombre_archivo = $nombre_archivo;
+								/*pnr_head table end*/
+								$numbers_ref = [];
+								$num_docs = [];
+								if (!empty($pnr_cod)) {
+									
+									try {
+										foreach ($dataElementsIndiv	 as $key => $dataElement) {
+											if (!empty($dataElement["serviceRequest"])) {
+												if ($dataElement["serviceRequest"]["ssr"]["type"] == "FOID") {
+													$num_docs[] = $dataElement["serviceRequest"]["ssr"]["freeText"];
+													$numbers_ref[] = $dataElement["referenceForDataElement"]["reference"]["number"];
+												}
+											}
+										}
+										/*pnr_pax table inicio*/
+										$pasajeros = $pnrs["travellerInfo"];
+										//$arr_pnr_head = [];
+										//$arr_pnr_vuelo = [];
+										//$pasajeros_reserva = [];
+										$infs=0;
+										$adts=0;
+										$chds=0;
+										$boleto = "";
+										
+										if ($this->is_array_($pasajeros)) {
+											foreach ($pasajeros as $key => $pas) {
+												$reference = $pas["elementManagementPassenger"]["elementReference"]["number"];
+												foreach ($numbers_ref as $key => $numref) {
+													if ($numref == $reference) {
+														//buscar boleto
+														foreach ($dataElementsStruct as $key => $ElementsStruct) {
+															if (isset($ElementsStruct["ticketDocumentData"])) {
+																if (isset($ElementsStruct["referenceForStructDataElement"])) {
+																	$references = $ElementsStruct["referenceForStructDataElement"]["reference"];
+																	if ($this->is_array_($references)) {
+																		foreach ($references as $key => $referenceStruct) {
+																			if ($numref==$referenceStruct["number"] && $referenceStruct["qualifier"] == "PT") {
+																				$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
+																				$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
+																				$boleto = $otherCompany.$tktNumber;
+																			}
+																		}
+																	}else {
+																		if ($numref==$references["number"] && $references["qualifier"] == "PT") {
+																			$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
+																			$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
+																			$boleto = $otherCompany.$tktNumber;
+																		}
 																	}
 																}
-															}else {
-																if ($numref==$references["number"] && $references["qualifier"] == "PT") {
+															}
+														}
+														//buscar boleto fin
+
+														$passengerData = $pas["passengerData"];
+														if ($this->is_array_($passengerData)) {
+															foreach ($passengerData as $value) {
+																$pax = $value["travellerInformation"]["passenger"]["type"];
+																$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+																$adts = ($pax == "INF" ? $adts : ($adts + 1));//cuenta los adultos
+																
+																$nombrewosplit = $pas["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
+																//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+																if (strpos($nombrewosplit, (" ".$pax))===true) {
+																	$nombre = explode((" ".$pax), $nombrewosplit)[0];
+																} else {
+																	$nombre = $nombrewosplit;
+																}
+																$apellido = $pas["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
+																$tipodoc = substr($num_docs[$key], 0, 2);
+																$numdoc = substr($num_docs[$key], strlen($tipodoc));
+																$tipopax = $value["travellerInformation"]["passenger"]["type"];
+																$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
+																$boleto = "";
+															}
+														} else {
+															$passenger = $passengerData["travellerInformation"]["passenger"];
+															if ($this->is_array_($passenger)) {//con infantes
+																$adulto_con_infante = $pas["enhancedPassengerData"];
+																foreach ($adulto_con_infante as $pasajero) {
+																	$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
+																	$pax = $pax == null ? "ADT" : $pax;
+
+																	$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+																	$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+																	$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
+																	//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
+																	if (strpos($nombrewosplit, (" ".$pax))===true) {
+																		$nombre = explode((" ".$pax), $nombrewosplit)[0];
+																	} else {
+																		$nombre = $nombrewosplit;
+																	}
+																	$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
+																	$tipodoc = substr($num_docs[$key], 0, 2);
+																	$numdoc = substr($num_docs[$key], strlen($tipodoc));
+																	$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
+																	$boleto = "";
+																}
+															} else {
+																$pax = $passengerData["travellerInformation"]["passenger"]["type"];
+																$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+																$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
+
+																$nombrewosplit = $pas["passengerData"]["travellerInformation"]["passenger"]["firstName"];
+																//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+																if (strpos($nombrewosplit, (" ".$pax))===true) {
+																	$nombre = explode((" ".$pax), $nombrewosplit)[0];
+																} else {
+																	$nombre = $nombrewosplit;
+																}
+																$apellido = $pas["passengerData"]["travellerInformation"]["traveller"]["surname"];
+																$tipodoc = substr($num_docs[$key], 0, 2);
+																$numdoc = substr($num_docs[$key], strlen($tipodoc));
+																$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
+																$boleto = "";
+															}
+														}
+													}
+												}
+											}
+										} else {
+											$nombrewosplit = "";
+											$boleto = "";
+											//$reference = $pasajeros["elementManagementPassenger"]["reference"]["number"];
+											$pass = $pasajeros["passengerData"];//con infante
+											//buscar boleto
+											$numref = $pasajeros["elementManagementPassenger"]["elementReference"]["reference"]["number"];
+											foreach ($dataElementsStruct as $key => $ElementsStruct) {
+												if (isset($ElementsStruct["ticketDocumentData"])) 
+												{
+													if (isset($ElementsStruct["referenceForStructDataElement"])) 
+													{
+														$references = $ElementsStruct["referenceForStructDataElement"]["reference"];
+														if ($this->is_array_($references)) 
+														{
+															foreach ($references as $key => $referenceStruct){
+																if ($numref==$referenceStruct["number"] && $referenceStruct["qualifier"] == "PT") 
+																{
 																	$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
 																	$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
 																	$boleto = $otherCompany.$tktNumber;
+																	break;
 																}
 															}
-														}
-													}
-												}
-												//buscar boleto fin
-
-												$passengerData = $pas["passengerData"];
-												if ($this->is_array_($passengerData)) {
-													foreach ($passengerData as $value) {
-														$pax = $value["travellerInformation"]["passenger"]["type"];
-														$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
-														$adts = ($pax == "INF" ? $adts : ($adts + 1));//cuenta los adultos
-														
-														$nombrewosplit = $pas["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
-														//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
-														if (strpos($nombrewosplit, (" ".$pax))===true) {
-															$nombre = explode((" ".$pax), $nombrewosplit)[0];
-														} else {
-															$nombre = $nombrewosplit;
-														}
-														$apellido = $pas["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
-														$tipodoc = substr($num_docs[$key], 0, 2);
-														$numdoc = substr($num_docs[$key], strlen($tipodoc));
-														$tipopax = $value["travellerInformation"]["passenger"]["type"];
-														$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
-														$boleto = "";
-													}
-												} else {
-													$passenger = $passengerData["travellerInformation"]["passenger"];
-													if ($this->is_array_($passenger)) {//con infantes
-														$adulto_con_infante = $pas["enhancedPassengerData"];
-														foreach ($adulto_con_infante as $pasajero) {
-															$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
-															$pax = $pax == null ? "ADT" : $pax;
-
-															$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
-															$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
-															$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
-															//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
-															if (strpos($nombrewosplit, (" ".$pax))===true) {
-																$nombre = explode((" ".$pax), $nombrewosplit)[0];
-															} else {
-																$nombre = $nombrewosplit;
+														}else {
+															if ($numref==$references["number"] && $references["qualifier"] == "PT") 
+															{
+																$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
+																$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
+																$boleto = $otherCompany.$tktNumber;
+																break;
 															}
-															$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
-															$tipodoc = substr($num_docs[$key], 0, 2);
-															$numdoc = substr($num_docs[$key], strlen($tipodoc));
-															$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
-															$boleto = "";
 														}
+													}
+													break;
+												}
+											}
+											//buscar boleto fin
+											if ($this->is_array_($pass)) {
+												foreach ($pass as $key => $value) {
+													$pax = $value["travellerInformation"]["passenger"]["type"];
+													$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+													$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los infantes
+													$nombrewosplit = $pasajeros["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
+													//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+													if (strpos($nombrewosplit, (" ".$pax))===true) {
+														$nombre = explode((" ".$pax), $nombrewosplit)[0];
 													} else {
-														$pax = $passengerData["travellerInformation"]["passenger"]["type"];
-														$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
-														$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
+														$nombre = $nombrewosplit;
+													}
+													$apellido = $pasajeros["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
+													$tipodoc = substr($num_docs[$key], 0, 2);
+													$numdoc = substr($num_docs[$key], strlen($tipodoc));
+													$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
+													$boleto = "";
+												}
+											} else { //sin infante
+												$passenger = $pass["travellerInformation"]["passenger"];
+												if ($this->is_array_($passenger)) 
+												{//con infantes
+													$adulto_con_infante = $pasajeros["enhancedPassengerData"];
+													foreach ($adulto_con_infante as $pasajero) {
+														$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
+														$pax = empty($pax) ? "ADT" : $pax;
 
-														$nombrewosplit = $pas["passengerData"]["travellerInformation"]["passenger"]["firstName"];
-														//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+														$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+														$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
+														$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
+														//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
 														if (strpos($nombrewosplit, (" ".$pax))===true) {
 															$nombre = explode((" ".$pax), $nombrewosplit)[0];
 														} else {
 															$nombre = $nombrewosplit;
 														}
-														$apellido = $pas["passengerData"]["travellerInformation"]["traveller"]["surname"];
+														$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
 														$tipodoc = substr($num_docs[$key], 0, 2);
 														$numdoc = substr($num_docs[$key], strlen($tipodoc));
 														$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
 														$boleto = "";
 													}
-												}
-											}
-										}
-									}
-								} else {
-									$nombrewosplit = "";
-									$boleto = "";
-									//$reference = $pasajeros["elementManagementPassenger"]["reference"]["number"];
-									$pass = $pasajeros["passengerData"];//con infante
-									//buscar boleto
-									$numref = $pasajeros["elementManagementPassenger"]["elementReference"]["reference"]["number"];
-									foreach ($dataElementsStruct as $key => $ElementsStruct) {
-										if (isset($ElementsStruct["ticketDocumentData"])) 
-										{
-											if (isset($ElementsStruct["referenceForStructDataElement"])) 
-											{
-												$references = $ElementsStruct["referenceForStructDataElement"]["reference"];
-												if ($this->is_array_($references)) 
-												{
-													foreach ($references as $key => $referenceStruct){
-														if ($numref==$referenceStruct["number"] && $referenceStruct["qualifier"] == "PT") 
-														{
-															$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
-															$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
-															$boleto = $otherCompany.$tktNumber;
-															break;
-														}
-													}
-												}else {
-													if ($numref==$references["number"] && $references["qualifier"] == "PT") 
-													{
-														$otherCompany = $ElementsStruct["ticketDocumentData"]["numAirlineCode"]["companyIdentification"]["otherCompany"];
-														$tktNumber = $ElementsStruct["ticketDocumentData"]["tktNumber"]["documentDetails"]["number"];
-														$boleto = $otherCompany.$tktNumber;
-														break;
-													}
-												}
-											}
-											break;
-										}
-									}
-									//buscar boleto fin
-									if ($this->is_array_($pass)) {
-										foreach ($pass as $key => $value) {
-											$pax = $value["travellerInformation"]["passenger"]["type"];
-											$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
-											$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los infantes
-											$nombrewosplit = $pasajeros["passengerData"][($pax == "INF" ? 1 : 0)]["travellerInformation"]["passenger"]["firstName"];
-											//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
-											if (strpos($nombrewosplit, (" ".$pax))===true) {
-												$nombre = explode((" ".$pax), $nombrewosplit)[0];
-											} else {
-												$nombre = $nombrewosplit;
-											}
-											$apellido = $pasajeros["passengerData"][0]["travellerInformation"]["traveller"]["surname"];
-											$tipodoc = substr($num_docs[$key], 0, 2);
-											$numdoc = substr($num_docs[$key], strlen($tipodoc));
-											$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
-											$boleto = "";
-										}
-									} else { //sin infante
-										$passenger = $pass["travellerInformation"]["passenger"];
-										if ($this->is_array_($passenger)) 
-										{//con infantes
-											$adulto_con_infante = $pasajeros["enhancedPassengerData"];
-											foreach ($adulto_con_infante as $pasajero) {
-												$pax = $pasajero["enhancedTravellerInformation"]["travellerNameInfo"]["type"];
-												$pax = empty($pax) ? "ADT" : $pax;
-
-												$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
-												$infs = ($pax == "INF" ? ($infs + 1) : $infs);//cuenta los infantes
-												$nombrewosplit = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["givenName"];
-												//nombre = nombrewosplit.ToString().Contains(pax) ? nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4) : nombrewosplit.ToString();
-												if (strpos($nombrewosplit, (" ".$pax))===true) {
-													$nombre = explode((" ".$pax), $nombrewosplit)[0];
 												} else {
-													$nombre = $nombrewosplit;
+													$pax = $pass["travellerInformation"]["passenger"]["type"];
+													$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
+													$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
+													$nombrewosplit = $pasajeros["passengerData"]["travellerInformation"]["passenger"]["firstName"];
+													//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
+													if (strpos($nombrewosplit, (" ".$pax))===true) {
+														$nombre = explode((" ".$pax), $nombrewosplit)[0];
+													} else {
+														$nombre = $nombrewosplit;
+													}
+													$apellido = $pasajeros["passengerData"]["travellerInformation"]["traveller"]["surname"];
+													$tipodoc = substr($num_docs[0], 0, 2);
+													$numdoc = substr($num_docs[0], strlen($tipodoc));
+													$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
+													$boleto = "";
 												}
-												$apellido = $pasajero["enhancedTravellerInformation"]["otherPaxNamesDetails"]["surname"];
-												$tipodoc = substr($num_docs[$key], 0, 2);
-												$numdoc = substr($num_docs[$key], strlen($tipodoc));
-												$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
-												$boleto = "";
 											}
-										} else {
-											$pax = $pass["travellerInformation"]["passenger"]["type"];
-											$adts = ($pax == "ADT" ? ($adts + 1) : $adts);//cuenta los adultos
-											$chds = ($pax == "ADT" ? $chds : ($chds + 1));//cuenta los niños
-											$nombrewosplit = $pasajeros["passengerData"]["travellerInformation"]["passenger"]["firstName"];
-											//nombre = nombrewosplit.ToString().Substring(0, nombrewosplit.Length - 4);
-											if (strpos($nombrewosplit, (" ".$pax))===true) {
-												$nombre = explode((" ".$pax), $nombrewosplit)[0];
-											} else {
-												$nombre = $nombrewosplit;
-											}
-											$apellido = $pasajeros["passengerData"]["travellerInformation"]["traveller"]["surname"];
-											$tipodoc = substr($num_docs[0], 0, 2);
-											$numdoc = substr($num_docs[0], strlen($tipodoc));
-											$pasajeros_reserva[] = "('".$pnr_cod."','".$numdoc."','".$apellido."','".$nombre."','".$pax."','".$tipodoc."','".$boleto."')";
-											$boleto = "";
 										}
+										/*pnr_pax table end*/
+									//echo $pnr_cod;
+									$arr_pnr_head[] = "('".$pnr_cod."','".$nombre_archivo."')";
+
+									/*print_r($arr_pnr_head);
+									print_r($arr_pnr_vuelo);
+									print_r($pasajeros_reserva);
+									echo "corte pnr";*/
+									} catch (Exception $th) {
+										echo $th->getMessage();
 									}
 								}
-								/*pnr_pax table end*/
-							//echo $pnr_cod;
-							$arr_pnr_head[] = "('".$pnr_cod."','".$nombre_archivo."')";
-
-							print_r($arr_pnr_head);
-							print_r($arr_pnr_vuelo);
-							print_r($pasajeros_reserva);
-							echo "corte pnr";
-							} catch (Exception $th) {
-								echo $th->getMessage();
-							}
+							//}fin for
 						}
-					//}fin for
+					}
+					//echo $upload_folder.$archivo;
+					//echo $destino_folder.$archivo;
+					fclose($handle);
+					rename (($upload_folder.$archivo),($destino_folder.$archivo."bk"));
+					$modelo->insertDataMasivo("pnr_head",array("pnr_cod","nombre_archivo"), $arr_pnr_head);
+					$modelo->insertDataMasivo("pnr_pax",array("pnr_cod","numdoc","apellido","nombre","pax","tipodoc","boleto"), $pasajeros_reserva);
+					$modelo->insertDataMasivo("pnr_vuelo",array("pnr_cod","trama","vuelo"), $arr_pnr_vuelo);
+					
 				}
 			}
-			$modelo->insertDataMasivo("pnr_head",array("pnr_cod","nombre_archivo"), $arr_pnr_head);
-			$modelo->insertDataMasivo("pnr_pax",array("pnr_cod","numdoc","apellido","nombre","pax","tipodoc","boleto"), $pasajeros_reserva);
-			$modelo->insertDataMasivo("pnr_vuelo",array("pnr_cod","trama","vuelo"), $arr_pnr_vuelo);
-			fclose($handle);
 		}
 	}
 } 
